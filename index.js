@@ -174,13 +174,13 @@ class AmountTooLargeError extends Error { }
  * @return {Promise<string>}
  * @example
  * const txid = await transferEVM2Obyte({
-	amount: 0.1,
+	amount: 100.0,
 	src_network: 'Ethereum',
 	src_asset: 'USDC',
 	dst_network: 'Obyte',
 	dst_asset: 'GBYTE',
 	recipient_address: 'EJC4A7WQGHEZEKW6RLO7F26SAR4LAQBU',
-	assistant_reward_percent: 1.00,
+	assistant_reward_percent: 1.0,
 	signer,
 	testnet: false,
 	obyteClient: client,
@@ -249,13 +249,13 @@ async function transferEVM2Obyte({ amount, src_network, src_asset, dst_network, 
  * @return {Promise<number>}
  * @example
  * const amountOut = await estimateOutput({
-	amount: 0.1,
+	amount: 100.0,
 	src_network: 'Ethereum',
 	src_asset: 'USDC',
 	dst_network: 'Obyte',
 	dst_asset: 'GBYTE',
 	recipient_address: 'EJC4A7WQGHEZEKW6RLO7F26SAR4LAQBU',
-	assistant_reward_percent: 1.00,
+	assistant_reward_percent: 1.0,
 	testnet: false,
 	obyteClient: client,
 });

@@ -30,7 +30,7 @@ const txid = await transferEVM2Obyte({
 	dst_network: 'Obyte',
 	dst_asset: 'GBYTE',
 	recipient_address: 'EJC4A7WQGHEZEKW6RLO7F26SAR4LAQBU',
-	assistant_reward_percent: 1.00,
+	assistant_reward_percent: 1.0,
 //	signer, // signer is optional, will automatically use MetaMask
 	testnet: false,
 });
@@ -54,13 +54,13 @@ const ethWallet = ethers.Wallet.fromMnemonic(process.env.mnemonic);
 const signer = ethWallet.connect(provider);
 
 const txid = await transferEVM2Obyte({
-	amount: 0.1,
+	amount: 100.0,
 	src_network: 'Ethereum',
 	src_asset: 'USDC',
 	dst_network: 'Obyte',
 	dst_asset: 'GBYTE',
 	recipient_address: 'EJC4A7WQGHEZEKW6RLO7F26SAR4LAQBU',
-	assistant_reward_percent: 1.00,
+	assistant_reward_percent: 1.0,
 	signer,
 	testnet: process.env.testnet,
 });
@@ -107,13 +107,13 @@ This is the main function of this SDK. It sends a cross-chain transfer from an E
 If the destination coin on Obyte is not the bridged version of the original coin (such as USDC-on-Ethereum to USDC-on-Obyte), the function tries to find an Oswap pool that would convert the bridged coin to the destination coin (such as USDC-on-Obyte to GBYTE). In this case, the cross-chain transfer is sent not to the recipient but to a [forwarder AA](forwarder.oscript), and additional data is sent in the transfer that instructs the AA to swap the received coins to the destination coins and send them to the recipient.
 ```js
 const txid = await transferEVM2Obyte({
-	amount: 0.1,
+	amount: 100.0,
 	src_network: 'Ethereum',
 	src_asset: 'USDC',
 	dst_network: 'Obyte',
 	dst_asset: 'GBYTE',
 	recipient_address: 'EJC4A7WQGHEZEKW6RLO7F26SAR4LAQBU',
-	assistant_reward_percent: 1.00,
+	assistant_reward_percent: 1.0,
 	signer,
 	testnet: false,
 	obyteClient: client,
@@ -140,13 +140,13 @@ The function can throw `NoMetamaskError`, `NoBridgeError`, `AmountTooLargeError`
 Similar to `transferEVM2Obyte` but this function only estimates the amount to be received. It takes into account the assistant reward, the exchange rate when swapping, the swapping fee, and slippage.
 ```js
 const amountOut = await estimateOutput({
-	amount: 0.1,
+	amount: 100.0,
 	src_network: 'Ethereum',
 	src_asset: 'USDC',
 	dst_network: 'Obyte',
 	dst_asset: 'GBYTE',
 	recipient_address: 'EJC4A7WQGHEZEKW6RLO7F26SAR4LAQBU',
-	assistant_reward_percent: 1.00,
+	assistant_reward_percent: 1.0,
 	testnet: false,
 	obyteClient: client,
 });
