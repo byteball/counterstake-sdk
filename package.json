@@ -1,11 +1,27 @@
 {
 	"name": "counterstake-sdk",
 	"version": "0.1.0",
-	"description": "Counterstake SDK",
+	"description": "Counterstake SDK for integrating cross-chain transactions in your dapps",
 	"main": "index.js",
 	"repository": "https://github.com/byteball/counterstake-sdk.git",
 	"author": "tony",
 	"license": "MIT",
+	"keywords": [
+		"cross-chain",
+		"cross-chain bridge",
+		"cross-chain swap",
+		"interoperability",
+		"interchain",
+		"bridge",
+		"swap",
+		"dapp",
+		"Obyte",
+		"DAG",
+		"DLT",
+		"distributed ledger",
+		"crypto",
+		"cryptocurrency"
+	],
 	"dependencies": {
 		"ethers": "^5.4.3",
 		"node-fetch": "^2.6.1",
