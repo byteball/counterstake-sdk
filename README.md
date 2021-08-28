@@ -1,6 +1,6 @@
 # Counterstake SDK
 
-This SDK allows to integrate cross-chain transactions in your dapps. It uses [Counterstake Bridge](https://counterstake.org) for cross-chain transfers and optionally [Oswap.io](https://oswap.io) for swaps.
+This SDK enables you to integrate cross-chain transactions in your dapps. It uses [Counterstake Bridge](https://counterstake.org) for cross-chain transfers and optionally [Oswap.io](https://oswap.io) for swaps.
 
 The SDK works both in browser and in server based apps (bots).
 
@@ -17,7 +17,7 @@ yarn add counterstake-sdk
 
 ## Quick start
 
-Here is how you would transfer 100 USDC from Ethereum and receive GBYTE on Obyte side. Under the hood, USDC-on-Ethereum will be first transferred to Obyte through [Counterstake Bridge](https://counterstake.org), then the receiving AA will swap USDC-on-Obyte to GBYTE-on-Obyte using [Oswap.io](https://oswap.io) and have it sent to the `recipient_address`.
+Here is how you would transfer 100 USDC from Ethereum and receive GBYTE on the Obyte side. Under the hood, USDC-on-Ethereum will be first transferred to Obyte through [Counterstake Bridge](https://counterstake.org), then the receiving AA will swap USDC-on-Obyte to GBYTE-on-Obyte using [Oswap.io](https://oswap.io) and have it sent to the `recipient_address`.
 
 Browser:
 ```js
@@ -120,7 +120,7 @@ const txid = await transferEVM2Obyte({
 });
 ```
 The function's only argument is an object with the following fields:
-* `amount`: amount to be transfered in tokens, fractional number or string.
+* `amount`: amount in tokens to be transferred, fractional number or string.
 * `src_network`: source network where the tokens are to be transferred from: `Ethereum`, `BSC`, or `Polygon`.
 * `src_asset`: the token to transfer, its symbol (`ETH`, `USDC`, etc) or token address.
 * `dst_network`: destination network where the tokens are to be transferred to: `Obyte`, `Ethereum`, `BSC`, or `Polygon`. Subsequent swaps are supported on Obyte only.
@@ -129,7 +129,7 @@ The function's only argument is an object with the following fields:
 * `assistant_reward_percent`: percentage of the amount to be paid to an assistant for helping to process the cross-chain transfer.
 * `signer`: signer object from [ethers](https://docs.ethers.io) for signing the transfer transaction. It is optional in browser: if missing, the SDK will use MetaMask to create it and ask the user to change the network if necessary.
 * `testnet`: whether to use testnet. Optional. If missing, mainnet is assumed.
-* `obyteClient`: [obyte.js](https://obytejs.com) client to use for getting data from Obyte DAG. Optional. Pass it here if you are already using obyte.js in your dapp and want the SDK to reuse the existing connection. If missing, the SDK will create an obyte.js client. If the function is called several times without `obyteClient`, the SDK will create a connection only once and reuse it between calls.
+* `obyteClient`: [obyte.js](https://obytejs.com) client to use for getting data from the Obyte DAG. Optional. Pass it here if you are already using obyte.js in your dapp and want the SDK to reuse the existing connection. If missing, the SDK will create an obyte.js client. If the function is called several times without `obyteClient`, the SDK will create a connection only once and reuse it between calls.
 
 The function returns the transaction hash of the sending transaction. You can use it to track the progress of the transfer using `csEvents`.
 
@@ -172,7 +172,7 @@ The `claim` object has the following fields:
 * `sender_address`: sender's address on the source chain.
 * `address`: address of the recipient of the cross-chain transfer. It can be either the recipient's own address if they receive the same coin as they sent (but on another network) or the address of an AA that performs the subsequent swap and sends the proceeds to the final recipient.
 * `txid`: transaction hash of the sending transaction. Use it to match the claim with the prior sending transaction.
-* `txts`: timestamp of the sending transction.
+* `txts`: timestamp of the sending transaction.
 * `amount`: sent amount (in pennies, an integer number on Obyte or a BigNumber on EVM).
 * `reward`: assistant reward (in pennies, an integer number on Obyte or a BigNumber on EVM).
 * `data`: data sent with the transaction, a string.
@@ -201,9 +201,9 @@ errors = {
 	AmountTooLargeError
 }
 ```
-* `NoMetamaskError`: thrown when MetaMask is not installed in teh browser.
+* `NoMetamaskError`: thrown when MetaMask is not installed in the browser.
 * `NoBridgeError`: thrown when there is no bridge that allows to send the source token to the other chain
-* `NoOswapPoolError`: thrown when there is no Oswap pool (or it exists but has 0 liquidity) that allows to swap the coin received from the bridge for the destination coin.
+* `NoOswapPoolError`: thrown when there is no Oswap pool (or it exists but has 0 liquidity) that allows swapping the coin received from the bridge for the destination coin.
 * `AmountTooLargeError`: thrown when the amount to be sent is too large and assistants cannot help with it. This SDK doesn't support self-claims.
 
 If any of the functions throws, use `instanceof` to determine the type of the error and handle it:
@@ -214,7 +214,7 @@ try {
 	...
 }
 catch (e) {
-	if (e instanceof errors.AmountTooLargeError, e) {
+	if (e instanceof errors.AmountTooLargeError) {
 		console.log('amount too large', e);
 		// handle this error
 	}
@@ -235,12 +235,12 @@ The returned object has the following fields:
 * `sender_address`: sender's address on the source chain.
 * `dest_address`: address of the recipient of the cross-chain transfer. It can be either the recipient's own address if they receive the same coin as they sent (but on another network) or the address of an AA that performs the subsequent swap and sends the proceeds to the final recipient.
 * `txid`: transaction hash of the sending transaction, same as in the request.
-* `txts`: timestamp of the sending transction.
+* `txts`: timestamp of the sending transaction.
 * `amount`: sent amount (in pennies, a string).
 * `reward`: assistant reward (in pennies, a string).
 * `data`: data sent with the transaction, a string.
 * `claimant_address`: address of the claimant, usually an assistant.
-* `status`: claim status: `sent`, `mined`, `claimed` (if only a request has been receved) or `claim_confirmed`.
+* `status`: claim status: `sent`, `mined`, `claimed` (if only a request has been received) or `claim_confirmed`.
 * `claim_txid`: claim transaction hash.
 * `claim_num`: claim number, available for confirmed claims only.
 
@@ -266,8 +266,8 @@ The function returns an array of objects describing each bridge. The objects inc
 * `foreign_symbol`: asset's symbol on the foreign network.
 * `stake_asset`: asset id or token contract address of the asset used to back one's claims on the foreign chain, the same asset is used for counterstaking.
 * `import_aa`: AA/contract on the foreign chain used for importing tokens from the home chain.
-* `min_expatriation_reward`: mininmum reward to be paid to an assistant whe expatriating the token (home to foreign). A fractional number.
-* `min_repatriation_reward`: mininmum reward to be paid to an assistant whe repatriating the token (foreign to home). A fractional number.
+* `min_expatriation_reward`: minimum reward to be paid to an assistant when expatriating the token (home to foreign). A fractional number.
+* `min_repatriation_reward`: minimum reward to be paid to an assistant when repatriating the token (foreign to home). A fractional number.
 * `count_expatriation_claimants`: the number of assistants recently active on the foreign chain that can help with an expatriation transfer.
 * `count_repatriation_claimants`: the number of assistants recently active on the home chain that can help with a repatriation transfer.
 * `max_expatriation_amount`: maximum amount assistants can help with when expatriating. A fractional number.
@@ -291,7 +291,7 @@ const bridge = await findBridge(src_network, dst_network, src_asset, testnet);
 ```
 * `src_network` is the source network such as `Obyte`, `Ethereum`, `BSC`, `Polygon`.
 * `dst_network` is the destination network.
-* `src_asset` is symbol or asset id (or token contract address for EVM) of the transferred asset on the source network.
+* `src_asset` is the symbol or asset id (or token contract address for EVM) of the transferred asset on the source network.
 * `testnet` is an indication whether we are working on testnet.
 
 The function returns an object that describes the found bridge, or `null` if no bridge was found. The object has the following fields:
@@ -318,7 +318,7 @@ const pool = await findOswapPool(from_asset, to_asset, testnet, obyteClient);
 * `testnet` is an indication whether we are working on testnet.
 * `obyteClient` is an optional obyte.js client. If not passed, the SDK will create its own.
 
-The function returns the address of the Oswap pool AA or returns `null` or `undefined` if none found.
+The function returns the address of the Oswap pool AA or returns `null` or `undefined` if none is found.
 
 
 ### `getOswapOutput`
