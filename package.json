@@ -1,0 +1,14 @@
+{
+	"name": "counterstake-sdk",
+	"version": "0.1.0",
+	"description": "Counterstake SDK",
+	"main": "index.js",
+	"repository": "https://github.com/byteball/counterstake-sdk.git",
+	"author": "tony",
+	"license": "MIT",
+	"dependencies": {
+		"ethers": "^5.4.3",
+		"node-fetch": "^2.6.1",
+		"obyte": "^0.1.16"
+	}
+}

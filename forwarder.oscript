@@ -1,0 +1,33 @@
+{
+	init: `{
+		$non_bytes_asset = trigger.output[[asset!=base]].asset;
+		if ($non_bytes_asset == 'ambiguous')
+			bounce('ambiguous asset');
+		$asset = $non_bytes_asset == 'none' ? 'base' : $non_bytes_asset;
+	}`,
+	messages: [
+		{
+			if: `{trigger.data.claim_num}`,
+			app: 'payment',
+			payload: {
+				asset: '{$asset}',
+				outputs: [{address: `{trigger.data.data.aa}`, amount: `{trigger.output[[asset=$asset]]}`}]
+			}
+		},
+		{
+			if: `{trigger.data.data}`,
+			app: 'data',
+			payload: `{
+				$data = trigger.data.data;
+				delete($data, 'aa');
+				$data
+			}`
+		},
+		{
+			app: 'state',
+			state: `{
+				response['message'] = trigger.data.claim_num ? 'forwarded' : 'deposited';
+			}`
+		}
+	]
+}
