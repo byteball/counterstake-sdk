@@ -10,6 +10,7 @@ const { getBridges, getTransfer } = require("./cs-api");
 
 const { BigNumber, utils: { parseUnits }, constants: { AddressZero } } = ethers;
 
+const FORWARDER_AA = 'MP6KBTUPYOT5UU5KWDT3FVD7KA26QEW4'; // double forwarder
   
 const counterstakeAbi = [
 	"event NewClaim(uint indexed claim_num, address author_address, string sender_address, address recipient_address, string txid, uint32 txts, uint amount, int reward, uint stake, string data, uint32 expiry_ts)"
@@ -186,12 +187,20 @@ class AmountTooLargeError extends Error { }
 	obyteClient: client,
 });
  */
-async function transferEVM2Obyte({ amount, src_network, src_asset, dst_network, dst_asset, recipient_address, assistant_reward_percent, signer, testnet, obyteClient }) {
+async function transferEVM2Obyte({ amount, src_network, src_asset, dst_network, dst_asset, recipient_address, data, assistant_reward_percent, signer, testnet, obyteClient }) {
 	if (!signer) {
 		if (typeof window === 'undefined')
 			throw Error(`need a signer`);
 		// in browser, we can create a signer ourselves
 		signer = await getSigner(src_network, testnet);
+	}
+	if (data) {
+		if (typeof data !== 'object')
+			throw Error(`data must be an object`);
+		if (Array.isArray(data) && data.length === 0)
+			throw Error(`empty array`);
+		if (Object.keys(data).length === 0)
+			throw Error(`empty object`);
 	}
 	const bridge = await findBridge(src_network, dst_network, src_asset, testnet);
 	if (!bridge)
@@ -204,10 +213,10 @@ async function transferEVM2Obyte({ amount, src_network, src_asset, dst_network, 
 	const bnReward = toBN(reward, min_decimals, src_decimals);
 	const contract = new ethers.Contract(src_bridge_aa, type === 'expatriation' ? exportAbi : importAbi, signer);
 	let address;
-	let data;
+	let strData;
 	if (dst_asset === bridge_dst_asset || dst_asset === bridge_dst_symbol) {
-		address = recipient_address;
-		data = '';
+		address = data ? FORWARDER_AA : recipient_address;
+		strData = data ? JSON.stringify({ address1: recipient_address, data1: data }) : '';
 	}
 	else { // transfer + swap
 		if (dst_network !== 'Obyte')
@@ -216,8 +225,14 @@ async function transferEVM2Obyte({ amount, src_network, src_asset, dst_network, 
 		const oswap_aa = await findOswapPool(bridge_dst_asset, dst_token.asset, testnet, obyteClient);
 		if (!oswap_aa)
 			throw new NoOswapPoolError(`found no oswap pool that connects ${bridge_dst_asset} and ${dst_asset}`);
-		address = 'ZK7A47LDICFBIG5OHRAF4YTQXS3KE3SM';
-		data = JSON.stringify({ to: recipient_address, aa: oswap_aa });
+		if (data) {
+			address = FORWARDER_AA;
+			strData = JSON.stringify({ address1: oswap_aa, data1: { to: FORWARDER_AA }, address2: recipient_address, data2: data });
+		}
+		else {
+			address = FORWARDER_AA;
+			strData = JSON.stringify({ address1: oswap_aa, data1: { to: recipient_address } });
+		}
 	}
 	if (dst_network === 'Obyte') {
 		const client = obyteClient || getObyteClient(testnet);
@@ -237,7 +252,7 @@ async function transferEVM2Obyte({ amount, src_network, src_asset, dst_network, 
 	else
 		await approve(bridge.src_asset, src_bridge_aa, signer);
 	const f = type === 'expatriation' ? contract.transferToForeignChain : contract.transferToHomeChain;
-	const res = await f(address, data, bnAmount, bnReward, opts);
+	const res = await f(address, strData, bnAmount, bnReward, opts);
 	console.log(res);
 	return res.hash;
 }

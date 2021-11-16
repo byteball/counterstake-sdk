@@ -113,6 +113,7 @@ const txid = await transferEVM2Obyte({
 	dst_network: 'Obyte',
 	dst_asset: 'GBYTE',
 	recipient_address: 'EJC4A7WQGHEZEKW6RLO7F26SAR4LAQBU',
+	data: {some: 'data'},
 	assistant_reward_percent: 1.0,
 	signer,
 	testnet: false,
@@ -126,6 +127,7 @@ The function's only argument is an object with the following fields:
 * `dst_network`: destination network where the tokens are to be transferred to: `Obyte`, `Ethereum`, `BSC`, or `Polygon`. Subsequent swaps are supported on Obyte only.
 * `dst_asset`: the token to receive on the destination network, its symbol or asset id (or contract address for EVM networks).
 * `recipient_address`: address of the recipient on the destination chain.
+* `data`: optional data to be passed to the recipient address. It's usefull for calling AAs on the destination side.
 * `assistant_reward_percent`: percentage of the amount to be paid to an assistant for helping to process the cross-chain transfer.
 * `signer`: signer object from [ethers](https://docs.ethers.io) for signing the transfer transaction. It is optional in browser: if missing, the SDK will use MetaMask to create it and ask the user to change the network if necessary.
 * `testnet`: whether to use testnet. Optional. If missing, mainnet is assumed.

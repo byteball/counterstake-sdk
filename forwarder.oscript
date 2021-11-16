@@ -1,32 +1,59 @@
+/*
+Double forwarder:
+- forward data1 to address1
+- receive some coins in response (single-asset responses only)
+- forward the coins, plus data2, to the final recipient address2 (which can be another AA)
+*/
 {
 	init: `{
 		$non_bytes_asset = trigger.output[[asset!=base]].asset;
 		if ($non_bytes_asset == 'ambiguous')
 			bounce('ambiguous asset');
 		$asset = $non_bytes_asset == 'none' ? 'base' : $non_bytes_asset;
+
+		$claim_num = trigger.data.claim_num;
+		$step1 = !!$claim_num; // from the bridge
+		if ($step1){
+			$data = trigger.data.data;
+			$address = $data.address1;
+			$data_to_forward = $data.data1;
+		}
+		else if (var['initial_unit'] AND var['initial_unit'] == trigger.initial_unit AND var['address2']){ // response from the AA called in step 1
+			$step2 = true;
+			$address = var['address2'];
+			$data_to_forward = var['data2'];
+		}
 	}`,
 	messages: [
 		{
-			if: `{trigger.data.claim_num}`,
+			if: `{$step1 OR $step2}`,
 			app: 'payment',
 			payload: {
 				asset: '{$asset}',
-				outputs: [{address: `{trigger.data.data.aa}`, amount: `{trigger.output[[asset=$asset]]}`}]
+				outputs: [{address: `{$address}`, amount: `{trigger.output[[asset=$asset]]}`}]
 			}
 		},
 		{
-			if: `{trigger.data.data}`,
+			if: `{$data_to_forward}`,
 			app: 'data',
 			payload: `{
-				$data = trigger.data.data;
-				delete($data, 'aa');
-				$data
+				$data_to_forward
 			}`
 		},
 		{
 			app: 'state',
 			state: `{
-				response['message'] = trigger.data.claim_num ? 'forwarded' : 'deposited';
+				if ($step1 AND $data.address2){ // save step2 data for future forwarding
+					var['initial_unit'] = trigger.initial_unit;
+					var['address2'] = $data.address2;
+					var['data2'] = $data.data2;
+				}
+				else if ($step2){
+					var['initial_unit'] = false;
+					var['address2'] = false;
+					var['data2'] = false;
+				}
+				response['message'] = $step1 ? 'forwarded 1' : ($step2 ? 'forwarded 2' : 'deposited');
 			}`
 		}
 	]
