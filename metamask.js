@@ -83,6 +83,8 @@ async function loginEthereum() {
 async function changeNetwork(network, testnet) {
 	const environment = getEnvironment(testnet);
 	const chainId = chainIds[environment][network];
+	if (chainId === undefined)
+		throw new Error("network not found");
 	return await window.ethereum.request({
 		method: 'wallet_switchEthereumChain',
 		params: [{ chainId: `0x${Number(chainId).toString(16)}` }],

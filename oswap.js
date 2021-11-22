@@ -1,6 +1,7 @@
 /*jslint node: true */
 'use strict';
 const crypto = require('crypto');
+const { isValidAddress } = require('obyte/lib/utils');
 const { getEnvironment } = require("./environment.js");
 const { getObyteClient } = require("./obyte-client.js");
 
@@ -38,6 +39,8 @@ function int_number_from_seed(seed) {
  * const pool = await findOswapPool(from_asset, to_asset, testnet, obyteClient);
  */
 async function findOswapPool(from_asset, to_asset, testnet, obyteClient) {
+	if (!from_asset || !to_asset)
+		throw Error("from_asset or to_asset isn't valid");
 	const from_index = int_number_from_seed(from_asset);
 	const to_index = int_number_from_seed(to_asset);
 	const pair = from_index > to_index ? from_asset + '_' + to_asset : to_asset + '_' + from_asset;
@@ -81,6 +84,9 @@ async function findOswapPool(from_asset, to_asset, testnet, obyteClient) {
 
 
 async function getPoolParams(pool, testnet, obyteClient) {
+	if (typeof pool !== "string" || !isValidAddress(pool))
+		throw Error("pool isn't valid")
+
 	if (!poolParams[pool]) {
 		const client = obyteClient || getObyteClient(testnet);
 		const definition = await client.api.getDefinition(pool);
@@ -91,6 +97,8 @@ async function getPoolParams(pool, testnet, obyteClient) {
 }
 
 async function getPoolBalances(pool, testnet, obyteClient) {
+	if (typeof pool !== "string" || !isValidAddress(pool))
+		throw Error("pool isn't valid")
 	if (cachedPoolBalances[pool] && cachedPoolBalances[pool].ts > Date.now() - pool_balances_cache_timeout)
 		return cachedPoolBalances[pool].balances;
 	const client = obyteClient || getObyteClient(testnet);
@@ -126,6 +134,8 @@ async function getOswapOutput(pool, in_amount_in_pennies, in_asset, testnet, oby
 	const in_balance = balances[in_asset];
 	const out_balance = balances[out_asset];
 
+	if (typeof in_amount_in_pennies !== "number")
+		throw Error("in_amount_in_pennies isn't valid")
 	const net_in_amount_in_pennies = in_amount_in_pennies * (1 - fee);
 	const out_amount_in_pennies = Math.floor(out_balance * net_in_amount_in_pennies / (in_balance + net_in_amount_in_pennies));
 	return out_amount_in_pennies;
