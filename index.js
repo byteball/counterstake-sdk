@@ -294,9 +294,7 @@ async function estimateOutput({ amount, src_network, src_asset, dst_network, dst
 		throw new NotValidParamError('assistant_reward_percent isn\'t valid')
 	const reward = assistant_reward_percent/100 * amount + min_reward;
 	const net_amount = +(amount - reward).toFixed(dst_decimals);
-	if (!dst_asset)
-		throw new NotValidParamError('no dst_asset')
-	if (dst_asset === bridge_dst_asset || dst_asset === bridge_dst_symbol)
+	if (dst_asset === bridge_dst_asset || dst_asset === bridge_dst_symbol || !dst_asset)
 		return net_amount;
 	// else we need to swap after transferring
 	if (dst_network !== 'Obyte')
