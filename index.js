@@ -2,6 +2,7 @@
 'use strict';
 const EventEmitter = require('events');
 const { ethers } = require("ethers");
+const { isValidAddress } = require('obyte/lib/utils');
 const { getSigner, NoMetamaskError } = require("./metamask.js");
 const { getObyteClient, watchAA, resumeWatchingAAs } = require("./obyte-client.js");
 const { findOswapPool, getOswapOutput } = require("./oswap.js");
@@ -147,6 +148,8 @@ async function findBridge(src_network, dst_network, src_asset, testnet) {
 
 
 async function approve(tokenAddress, spenderAddress, signer) {
+	if (typeof tokenAddress !== "string")
+		throw Error(`tokenAddress isn't valid`);
 	const sender_address = await signer.getAddress();
 	if (tokenAddress === AddressZero)
 		throw Error(`don't need to approve ETH`);
@@ -167,6 +170,7 @@ async function approve(tokenAddress, spenderAddress, signer) {
 class NoBridgeError extends Error { }
 class NoOswapPoolError extends Error { }
 class AmountTooLargeError extends Error { }
+class NotValidParamError extends Error { }
 
 /**
  * Send a cross-chain transfer from an EVM based chain to Obyte
@@ -202,19 +206,23 @@ async function transferEVM2Obyte({ amount, src_network, src_asset, dst_network, 
 		if (Object.keys(data).length === 0)
 			throw Error(`empty object`);
 	}
+	if (!recipient_address || !isValidAddress(recipient_address))
+		throw new NotValidParamError("recipient_address isn't valid");
 	const bridge = await findBridge(src_network, dst_network, src_asset, testnet);
 	if (!bridge)
 		throw new NoBridgeError(`no bridge from ${src_network} to ${dst_network} for ${src_asset}`);
 	const { src_bridge_aa, dst_bridge_aa, type, src_decimals, min_decimals, min_reward, max_amount, dst_asset: bridge_dst_asset, dst_symbol: bridge_dst_symbol } = bridge;
 	if (+amount > max_amount)
 		throw new AmountTooLargeError(`amount too large, assistants can help with only ${max_amount}`);
+	if (typeof assistant_reward_percent !== 'number')
+		throw new NotValidParamError("assistant_reward_percent isn't valid");
 	const reward = assistant_reward_percent/100 * amount + min_reward;
 	const bnAmount = toBN(amount, min_decimals, src_decimals);
 	const bnReward = toBN(reward, min_decimals, src_decimals);
 	const contract = new ethers.Contract(src_bridge_aa, type === 'expatriation' ? exportAbi : importAbi, signer);
 	let address;
 	let strData;
-	if (dst_asset === bridge_dst_asset || dst_asset === bridge_dst_symbol) {
+	if (dst_asset === bridge_dst_asset || dst_asset === bridge_dst_symbol || !dst_asset) {
 		address = data ? FORWARDER_AA : recipient_address;
 		strData = data ? JSON.stringify({ address1: recipient_address, data1: data }) : '';
 	}
@@ -282,9 +290,11 @@ async function estimateOutput({ amount, src_network, src_asset, dst_network, dst
 	const { dst_decimals, min_reward, max_amount, dst_asset: bridge_dst_asset, dst_symbol: bridge_dst_symbol } = bridge;
 	if (+amount > max_amount)
 		throw new AmountTooLargeError(`amount too large, assistants can help with only ${max_amount}`);
+	if (typeof assistant_reward_percent !== 'number')
+		throw new NotValidParamError("assistant_reward_percent isn't valid")
 	const reward = assistant_reward_percent/100 * amount + min_reward;
 	const net_amount = +(amount - reward).toFixed(dst_decimals);
-	if (dst_asset === bridge_dst_asset || dst_asset === bridge_dst_symbol)
+	if (dst_asset === bridge_dst_asset || dst_asset === bridge_dst_symbol || !dst_asset)
 		return net_amount;
 	// else we need to swap after transferring
 	if (dst_network !== 'Obyte')
