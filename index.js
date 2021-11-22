@@ -291,7 +291,7 @@ async function estimateOutput({ amount, src_network, src_asset, dst_network, dst
 	if (+amount > max_amount)
 		throw new AmountTooLargeError(`amount too large, assistants can help with only ${max_amount}`);
 	if (typeof assistant_reward_percent !== 'number')
-		throw new NotValidParamError('assistant_reward_percent isn\'t valid')
+		throw new NotValidParamError("assistant_reward_percent isn't valid")
 	const reward = assistant_reward_percent/100 * amount + min_reward;
 	const net_amount = +(amount - reward).toFixed(dst_decimals);
 	if (dst_asset === bridge_dst_asset || dst_asset === bridge_dst_symbol || !dst_asset)
