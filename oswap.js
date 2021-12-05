@@ -34,7 +34,7 @@ function int_number_from_seed(seed) {
  * @param {string} to_asset
  * @param {boolean} testnet
  * @param {Object} obyteClient
- * @return {Promise<string>}
+ * @return {Promise<?string>}
  * @example
  * const pool = await findOswapPool(from_asset, to_asset, testnet, obyteClient);
  */
