@@ -308,9 +308,31 @@ async function estimateOutput({ amount, src_network, src_asset, dst_network, dst
 	return +(out_amount_in_pennies / 10 ** dst_token.decimals).toFixed(dst_token.decimals);
 }
 
+/**
+ * Get the maximum amount that can be sent via cross-chain transfer
+ * @memberOf counterstake-sdk
+ * @param {Object} transferInfo
+ * @return {Promise<number>}
+ * @example
+ * const maxAmount = await getMaxAmount({
+	src_network: 'Ethereum',
+	src_asset: 'USDC',
+	dst_network: 'Obyte',
+	testnet: false
+});
+ */
+async function getMaxAmount({ src_network, src_asset, dst_network, testnet }) {
+	const bridge = await findBridge(src_network, dst_network, src_asset, testnet);
+	if (!bridge){
+		throw new NoBridgeError(`no bridge from ${src_network} to ${dst_network} for ${src_asset}`)
+	} else {
+		return bridge.max_amount;
+	}
+}
 
 exports.getBridges = getBridges;
 exports.getTransfer = getTransfer;
+exports.getMaxAmount = getMaxAmount;
 
 exports.getObyteClient = getObyteClient;
 
