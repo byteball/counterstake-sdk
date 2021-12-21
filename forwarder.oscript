@@ -33,6 +33,14 @@ Double forwarder:
 				outputs: [{address: `{$address}`, amount: `{trigger.output[[asset=$asset]]}`}]
 			}
 		},
+		{ // send additional 1000 bytes
+			if: `{($step1 OR $step2) AND $asset != 'base'}`,
+			app: 'payment',
+			payload: {
+				asset: 'base',
+				outputs: [{address: `{$address}`, amount: 1000}]
+			}
+		},
 		{
 			if: `{$data_to_forward}`,
 			app: 'data',

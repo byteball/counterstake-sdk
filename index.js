@@ -11,7 +11,7 @@ const { getBridges, getTransfer } = require("./cs-api");
 
 const { BigNumber, utils: { parseUnits }, constants: { AddressZero } } = ethers;
 
-const FORWARDER_AA = 'MP6KBTUPYOT5UU5KWDT3FVD7KA26QEW4'; // double forwarder
+const FORWARDER_AA = 'QRPI33656RFSEDEZHB5T2DNJ7R2WQQDS'; // double forwarder
   
 const counterstakeAbi = [
 	"event NewClaim(uint indexed claim_num, address author_address, string sender_address, address recipient_address, string txid, uint32 txts, uint amount, int reward, uint stake, string data, uint32 expiry_ts)"

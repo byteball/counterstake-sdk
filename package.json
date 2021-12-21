@@ -1,6 +1,6 @@
 {
 	"name": "counterstake-sdk",
-	"version": "0.1.5",
+	"version": "0.1.6",
 	"description": "Counterstake SDK for integrating cross-chain transactions in your dapps",
 	"main": "index.js",
 	"repository": "https://github.com/byteball/counterstake-sdk.git",
