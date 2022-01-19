@@ -153,6 +153,8 @@ async function approve(tokenAddress, spenderAddress, signer) {
 	const sender_address = await signer.getAddress();
 	if (tokenAddress === AddressZero)
 		throw Error(`don't need to approve ETH`);
+	if (tokenAddress === spenderAddress)
+		return "spender is already the same as the token to be spent";
 	const token = new ethers.Contract(tokenAddress, erc20Abi, signer);
 	const allowance = await token.allowance(sender_address, spenderAddress);
 	if (allowance.gt(0)) {
