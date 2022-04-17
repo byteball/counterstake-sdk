@@ -12,6 +12,7 @@ const { getBridges, getTransfer } = require("./cs-api");
 const { BigNumber, utils: { parseUnits }, constants: { AddressZero } } = ethers;
 
 const FORWARDER_AA = 'QRPI33656RFSEDEZHB5T2DNJ7R2WQQDS'; // double forwarder
+const OSWAP_FORWARDER_AA = 'EWPV5JZYOIKDCL6MTNHTWWO327FAEGET'; // oswap forwarder that estimates final_price
   
 const counterstakeAbi = [
 	"event NewClaim(uint indexed claim_num, address author_address, string sender_address, address recipient_address, string txid, uint32 txts, uint amount, int reward, uint stake, string data, uint32 expiry_ts)"
@@ -235,14 +236,11 @@ async function transferEVM2Obyte({ amount, src_network, src_asset, dst_network, 
 		const oswap_aa = await findOswapPool(bridge_dst_asset, dst_token.asset, testnet, obyteClient);
 		if (!oswap_aa)
 			throw new NoOswapPoolError(`found no oswap pool that connects ${bridge_dst_asset} and ${dst_asset}`);
-		if (data) {
-			address = FORWARDER_AA;
-			strData = JSON.stringify({ address1: oswap_aa, data1: { to: FORWARDER_AA }, address2: recipient_address, data2: data });
-		}
-		else {
-			address = FORWARDER_AA;
-			strData = JSON.stringify({ address1: oswap_aa, data1: { to: recipient_address } });
-		}
+		address = OSWAP_FORWARDER_AA;
+		const forwarder_data = { oswap_aa, address: recipient_address };
+		if (data)
+			forwarder_data.data = data;
+		strData = JSON.stringify(forwarder_data);
 	}
 	if (dst_network === 'Obyte') {
 		const client = obyteClient || getObyteClient(testnet);
