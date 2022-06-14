@@ -12,7 +12,7 @@ const { getBridges, getTransfer } = require("./cs-api");
 const { BigNumber, utils: { parseUnits }, constants: { AddressZero } } = ethers;
 
 const FORWARDER_AA = 'QRPI33656RFSEDEZHB5T2DNJ7R2WQQDS'; // double forwarder
-const OSWAP_FORWARDER_AA = 'EWPV5JZYOIKDCL6MTNHTWWO327FAEGET'; // oswap forwarder that estimates final_price
+const OSWAP_FORWARDER_AA = 'BFEMKOQR7G27YTAMNTIPDWHZNTBVMYFO'; // oswap forwarder that estimates final_price
   
 const counterstakeAbi = [
 	"event NewClaim(uint indexed claim_num, address author_address, string sender_address, address recipient_address, string txid, uint32 txts, uint amount, int reward, uint stake, string data, uint32 expiry_ts)"
@@ -194,7 +194,7 @@ class NotValidParamError extends Error { }
 	obyteClient: client,
 });
  */
-async function transferEVM2Obyte({ amount, src_network, src_asset, dst_network, dst_asset, recipient_address, data, assistant_reward_percent, signer, testnet, obyteClient }) {
+async function transferEVM2Obyte({ amount, src_network, src_asset, dst_network, dst_asset, recipient_address, oswap_change_address, data, assistant_reward_percent, signer, testnet, obyteClient }) {
 	if (!signer) {
 		if (typeof window === 'undefined')
 			throw Error(`need a signer`);
@@ -240,6 +240,8 @@ async function transferEVM2Obyte({ amount, src_network, src_asset, dst_network, 
 		const forwarder_data = { oswap_aa, address: recipient_address };
 		if (data)
 			forwarder_data.data = data;
+		if (oswap_change_address) // override if the recipient is an AA and you don't want it to receive the change
+			forwarder_data.change_address = oswap_change_address;
 		strData = JSON.stringify(forwarder_data);
 	}
 	if (dst_network === 'Obyte') {
