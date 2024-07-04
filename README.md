@@ -350,3 +350,10 @@ The function returns an object with the following fields:
 * `asset`: asset id
 * `symbol`: token's symbol from the decentralized [token registry](https://tokens.ooo).
 * `decimals`: number of decimals.
+
+
+## Donations
+
+We accept donations through [Kivach](https://kivach.org) and forward a portion of the donations to other open-source projects that made Counterstake SDK possible.
+
+[![Kivach](https://kivach.org/api/banner?repo=byteball/counterstake-sdk)](https://kivach.org/repo/byteball/counterstake-sdk)
