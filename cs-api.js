@@ -65,13 +65,33 @@ const request = async (url, options) => {
 	return data;
 }
 
-function getBaseUrl(testnet) {
-	return `https://${testnet ? 'testnet-bridge.' : ''}counterstake.org/api`;
+const requestUrls = async (urls, options) => {
+	let last_e;
+	for (let url of urls) {
+		try {
+			return await request(url, options);
+		}
+		catch (e) {
+			console.error(`request to ${url} failed:`, e);
+			last_e = e;
+		}
+	}
+	throw Error(`all requests failed: ${urls.join(', ')}, last error:`, last_e);
+}
+
+// includes a backup API from the watchdog
+function getBaseUrls(testnet) {
+	return testnet ? [`https://testnet-bridge.counterstake.org/api`] : [`https://counterstake.org/api`, `https://counterstake.org/wd-api`];
+}
+
+async function requestPath(path, testnet, options) {
+	const urls = getBaseUrls(testnet).map(base_url => base_url + path);
+	return await requestUrls(urls, options);
 }
 
 const fetchBridges = async (testnet) => {
 	console.log(`fetching bridges`);
-	const data = await request(`${getBaseUrl(testnet)}/bridges`);
+	const data = await requestPath(`/bridges`, testnet);
 	if (data.status !== 'success')
 		throw Error(`getting bridges failed ${JSON.stringify(data)}`);
 	const bridges = data.data;
@@ -89,7 +109,7 @@ const fetchBridges = async (testnet) => {
  * const transfer = await getTransfer(txid, testnet);
  */
  async function getTransfer(txid, testnet) {
-	const data = await request(`${getBaseUrl(testnet)}/transfer/?txid=${encodeURIComponent(txid)}`);
+	const data = await requestPath(`/transfer/?txid=${encodeURIComponent(txid)}`, testnet);
 	if (data.status !== 'success')
 		throw Error(`getting transfer ${txid} failed ${JSON.stringify(data)}`);
 	const transfer = data.data;
