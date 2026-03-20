@@ -7,8 +7,11 @@ const { getObyteClient } = require("./obyte-client.js");
 
 
 const oswap_factory_aas = {
-	testnet: 'OQLU4HOAIVJ32SDVBJA6AKD52OVTHAOF',
-	mainnet: 'OQLU4HOAIVJ32SDVBJA6AKD52OVTHAOF',
+	testnet: ['OQLU4HOAIVJ32SDVBJA6AKD52OVTHAOF'],
+	mainnet: [
+		'2LSGVHLZ5PNURPMIPNYHB4K5IPP2K3SJ', // Mar 2026
+		'OQLU4HOAIVJ32SDVBJA6AKD52OVTHAOF',
+	],
 };
 
 
@@ -40,7 +43,8 @@ async function findOswapPool(from_asset, to_asset, testnet, obyteClient) {
 		return cachedPoolsByPair[pair].pool;
 	const client = obyteClient || getObyteClient(testnet);
 	const var_prefix = 'pool_';
-	const vars = await client.api.getAaStateVars({ address: oswap_factory_aas[getEnvironment(testnet)], var_prefix });
+	const factory_addresses = oswap_factory_aas[getEnvironment(testnet)];
+	const vars = Object.assign({}, ...await Promise.all(factory_addresses.map(address => client.api.getAaStateVars({ address, var_prefix }))));
 	let pools = [];
 	for (let var_name in vars) {
 		const pool = var_name.substring(var_prefix.length);
