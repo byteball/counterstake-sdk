@@ -9,7 +9,7 @@ const { getObyteClient } = require("./obyte-client.js");
 const oswap_factory_aas = {
 	testnet: ['OQLU4HOAIVJ32SDVBJA6AKD52OVTHAOF'],
 	mainnet: [
-		'2LSGVHLZ5PNURPMIPNYHB4K5IPP2K3SJ', // Mar 2026
+		'4YI76KIHLEWB5VEFFCTA776TMGP7IA3L', // Apr 2026
 		'OQLU4HOAIVJ32SDVBJA6AKD52OVTHAOF',
 	],
 };
