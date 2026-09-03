@@ -110,7 +110,9 @@ function toBN(amount, min_decimals, decimals) {
  * const bridge = await findBridge(src_network, dst_network, src_asset, testnet);
  */
 async function findBridge(src_network, dst_network, src_asset, testnet) {
-	const bridges = await getBridges(testnet, false); // use cache if available
+	const bridges = (await getBridges(testnet, false)) // use cache if available
+		.slice()
+		.sort((a, b) => b.e_v === a.e_v ? b.i_v.localeCompare(a.i_v) : b.e_v.localeCompare(a.e_v));
 	for (let { export_aa, import_aa, home_network, foreign_network, home_asset, foreign_asset, home_symbol, foreign_symbol, home_asset_decimals, foreign_asset_decimals, min_expatriation_reward, min_repatriation_reward, max_expatriation_amount, max_repatriation_amount } of bridges) {
 		const min_decimals = Math.min(home_asset_decimals, foreign_asset_decimals);
 		if (src_network === home_network && dst_network === foreign_network && (src_asset === home_asset || src_asset === home_symbol))
