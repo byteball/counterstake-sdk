@@ -3,7 +3,7 @@
 	"version": "0.1.11",
 	"description": "Counterstake SDK for integrating cross-chain transactions in your dapps",
 	"main": "index.js",
-	"repository": "https://github.com/byteball/counterstake-sdk.git",
+	"repository": {"url": "git+https://github.com/byteball/counterstake-sdk.git"},
 	"author": "tony",
 	"license": "MIT",
 	"types": "types/index.d.ts",
