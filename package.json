@@ -1,6 +1,6 @@
 {
 	"name": "counterstake-sdk",
-	"version": "0.1.11",
+	"version": "0.1.12",
 	"description": "Counterstake SDK for integrating cross-chain transactions in your dapps",
 	"main": "index.js",
 	"repository": {"url": "git+https://github.com/byteball/counterstake-sdk.git"},
@@ -27,9 +27,9 @@
 		"cryptocurrency"
 	],
 	"dependencies": {
-		"ethers": "^5.4.3",
+		"ethers": "^5.8.0",
 		"node-fetch": "^2.6.1",
-		"obyte": "^0.1.16",
+		"obyte": "^0.2.0",
 		"oswap-v2-sdk": "^0.1.3"
 	}
 }
